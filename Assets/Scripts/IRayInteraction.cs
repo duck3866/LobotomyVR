@@ -4,5 +4,6 @@ using UnityEngine;
 
 public interface IRayInteraction
 {
-    public void RayInteract();
+    public bool RayInteract();
+    public void MoveCharacter(Vector3 point);
 }

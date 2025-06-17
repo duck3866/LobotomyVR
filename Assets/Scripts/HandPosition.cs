@@ -5,23 +5,48 @@ using UnityEngine;
 
 public class HandPosition : MonoBehaviour
 {
-    [SerializeField] private bool isRightHand = false;
+    [SerializeField] private GameObject leftHand;
+    [SerializeField] private GameObject rightHand;
+
+    // [SerializeField] private bool isRightHand = false;
+    [SerializeField] private LayerMask layerMask;
+    [SerializeField] private LayerMask characterLayerMask;
+    [SerializeField] private GameObject selectCharacter;
 
     private void Update()
     {
-        if (isRightHand)
+        if (ARAVRInput.GetDown(ARAVRInput.Button.IndexTrigger, ARAVRInput.Controller.RTouch))
         {
-            if (ARAVRInput.GetDown(ARAVRInput.Button.IndexTrigger))
+            Ray ray = new Ray(rightHand.transform.position, rightHand.transform.forward);
+            Debug.DrawRay(ray.origin, ray.direction * int.MaxValue, Color.red, 1);
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, int.MaxValue, layerMask))
             {
-                Ray ray = new Ray(transform.position, transform.forward);
-                Debug.DrawRay(ray.origin, ray.direction, Color.red, 5f);
-                if (Physics.Raycast(ray, out RaycastHit hitInfo))
+                if (hitInfo.collider.gameObject.TryGetComponent<IRayInteraction>(out var component))
                 {
-                    if (hitInfo.collider.gameObject.TryGetComponent<IRayInteraction>(out var component))
+                    component.RayInteract();
+                    if (selectCharacter != null)
                     {
-                        component.RayInteract();
+                        selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(hitInfo.collider.bounds.center);
                     }
                 }
+            }
+        }
+
+        if (ARAVRInput.GetDown(ARAVRInput.Button.IndexTrigger, ARAVRInput.Controller.LTouch))
+        {
+            Ray ray = new Ray(leftHand.transform.position, leftHand.transform.forward);
+            Debug.DrawRay(ray.origin, ray.direction * int.MaxValue, Color.blue, 1);
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, int.MaxValue, characterLayerMask))
+            {
+                if (hitInfo.collider.gameObject.TryGetComponent<IRayInteraction>(out var component))
+                {
+                    selectCharacter = hitInfo.collider.gameObject;
+                    Debug.Log("캐릭터 선택 " + hitInfo.collider.gameObject.layer);
+                }
+            }
+            else
+            {
+                selectCharacter = null;
             }
         }
 
@@ -30,15 +55,9 @@ public class HandPosition : MonoBehaviour
 
     private void HandMove()
     {
-        if (isRightHand)
-        {
-            transform.position = ARAVRInput.RHandPosition;
-            transform.rotation = ARAVRInput.GetRHandRotation();
-        }
-        else
-        {
-            transform.position = ARAVRInput.LHandPosition;
-            transform.rotation = ARAVRInput.GetLHandRotation();
-        }
+        rightHand.transform.position = ARAVRInput.RHandPosition;
+        rightHand.transform.rotation = ARAVRInput.GetRHandRotation();
+        leftHand.transform.position = ARAVRInput.LHandPosition;
+        leftHand.transform.rotation = ARAVRInput.GetLHandRotation();
     }
 }

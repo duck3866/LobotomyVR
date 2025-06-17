@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class Environment : MonoBehaviour, IRayInteraction
 {
-    public void RayInteract()
+    public bool RayInteract()
     {
         Debug.Log($"Room name : {gameObject.name}");
+        return false;
+    }
+
+    public void MoveCharacter(Vector3 point)
+    {
+        
     }
 }
