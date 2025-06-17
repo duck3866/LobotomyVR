@@ -12,9 +12,11 @@ public class HandPosition : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private LayerMask characterLayerMask;
     [SerializeField] private GameObject selectCharacter;
-
+    [SerializeField] private Transform RCrosshair;
+    [SerializeField] private Transform LCrosshair;
     private void Update()
     {
+       
         if (ARAVRInput.GetDown(ARAVRInput.Button.IndexTrigger, ARAVRInput.Controller.RTouch))
         {
             Ray ray = new Ray(rightHand.transform.position, rightHand.transform.forward);
@@ -23,10 +25,12 @@ public class HandPosition : MonoBehaviour
             {
                 if (hitInfo.collider.gameObject.TryGetComponent<IRayInteraction>(out var component))
                 {
-                    component.RayInteract();
-                    if (selectCharacter != null)
+                    bool isOk = component.RayInteract();
+                    if (selectCharacter != null && isOk)
                     {
-                        selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(hitInfo.collider.bounds.center);
+                        Vector3 position = new Vector3(hitInfo.point.x, 0, hitInfo.point.z);
+                        // selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(hitInfo.collider.bounds.center);
+                        selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(position);
                     }
                 }
             }
@@ -40,8 +44,11 @@ public class HandPosition : MonoBehaviour
             {
                 if (hitInfo.collider.gameObject.TryGetComponent<IRayInteraction>(out var component))
                 {
-                    selectCharacter = hitInfo.collider.gameObject;
-                    Debug.Log("캐릭터 선택 " + hitInfo.collider.gameObject.layer);
+                    if (component.RayInteract())
+                    {
+                        selectCharacter = hitInfo.collider.gameObject;
+                        Debug.Log("캐릭터 선택 " + hitInfo.collider.gameObject.layer);
+                    }
                 }
             }
             else
@@ -57,6 +64,8 @@ public class HandPosition : MonoBehaviour
     {
         rightHand.transform.position = ARAVRInput.RHandPosition;
         rightHand.transform.rotation = ARAVRInput.GetRHandRotation();
+        ARAVRInput.DrawCrosshair(RCrosshair,true,ARAVRInput.Controller.RTouch);
+        ARAVRInput.DrawCrosshair(LCrosshair,true,ARAVRInput.Controller.LTouch);
         leftHand.transform.position = ARAVRInput.LHandPosition;
         leftHand.transform.rotation = ARAVRInput.GetLHandRotation();
     }

@@ -9,9 +9,10 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
     private Animator _animator; 
     private NavMeshAgent _agent;
     private Vector3 _destination; // 목적지
-    [SerializeField] private Room _room; // 자기가 현재 있는 방
+    [SerializeField] private Room PreviousRoom; // 자기가 전에 있는 방
+    [SerializeField] private Room CurrentRoom; // 자기가 현재 있는 방
     private bool _isCC = false; // CC기 걸렸는지 여부 
-    private bool isWalk = false; // 일하고 있는지 여부
+    [SerializeField] private bool isWork = false; // 일하고 있는지 여부
     private GameObject enemy; // 추격 중인 적
     private void Start()
     {
@@ -46,8 +47,9 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
     }
     public virtual bool RayInteract()
     {
-        if (!_isCC && !isWalk)
+        if (!_isCC && !isWork)
         {
+            Debug.Log("??/");
             return true;
         }
         return false;
@@ -55,17 +57,24 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
 
     public virtual void MoveCharacter(Vector3 point)
     {
-        _destination = point;
-        isMoving = true;
-        _animator.SetTrigger("toWalk");
-        _agent.SetDestination(point);
+        if (!isWork)
+        {
+            PreviousRoom = CurrentRoom;
+            _destination = point;
+            isMoving = true;
+            _animator.SetTrigger("toWalk");
+            _agent.SetDestination(point);
+        }
     }
 
-    public void EnterRoom(GameObject room)
+    public void EnterRoom(GameObject room, bool isWork)
     {
-        _room = room.GetComponent<Room>();
-        // Debug.Log("??????????"+room.gameObject.name);
-        FindEnemy();
+        CurrentRoom = room.GetComponent<Room>();
+        
+        if (!isWork)
+        {
+            FindEnemy();
+        }
     }
 
     public void LeaveRoom()
@@ -75,11 +84,11 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
 
     public void FindEnemy()
     {
-        if (_room != null)
+        if (CurrentRoom != null)
         {
-            if (_room.enemyList.Count != 0)
+            if (CurrentRoom.enemyList.Count != 0)
             {
-                enemy = _room.enemyList[0].gameObject;
+                enemy = CurrentRoom.enemyList[0].gameObject;
             }
         }
     }
@@ -88,4 +97,19 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
     {
         
     }
+
+    public void Work(float time)
+    {
+        StartCoroutine(WalkCoroutine(time));
+    }
+
+    private IEnumerator WalkCoroutine(float time)
+    {
+        isWork = true;
+        yield return new WaitForSeconds(time);
+        Debug.Log("나가");
+        isWork = false;
+        MoveCharacter(PreviousRoom.transform.position);
+    }
 }
+
