@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class Workroom : Room
 {
-    [SerializeField] private float walkSpeed;
-    [SerializeField] private bool isWalking = false;
+    [SerializeField] private float walkSpeed; // 작업 속도
+    //todo: 나중에 작업 타입에 맞춰서 속도 늦쳐지도록 수정
+    [SerializeField] private bool isWalking = false; 
+    // 작업 중
+    [SerializeField] private GameObject enemyObject; // 관리중인 환상체
+    [SerializeField] private bool jailbreak = false;
     public override void OnTriggerEnter(Collider other)
     {
         Debug.Log(other.gameObject.name);
@@ -41,6 +45,7 @@ public class Workroom : Room
         {
             return false;
         }
+        isWalking = true;
         return true;
     }
 }
