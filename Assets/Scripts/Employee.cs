@@ -11,6 +11,7 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
     private Vector3 _destination; // 목적지
     [SerializeField] private Room PreviousRoom; // 자기가 전에 있는 방
     [SerializeField] private Room CurrentRoom; // 자기가 현재 있는 방
+    [SerializeField] private Room controlRoom; // 명령받은 방
     private bool _isCC = false; // CC기 걸렸는지 여부 
     [SerializeField] private bool isWork = false; // 일하고 있는지 여부
     private GameObject enemy; // 추격 중인 적
@@ -27,8 +28,7 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo,int.MaxValue))
             {
-                Vector3 hitPoint = new Vector3(hitInfo.point.x, 0, hitInfo.point.z);
-                MoveCharacter(hitPoint);
+                MoveCharacter(hitInfo.collider.gameObject);
             }
         }
         if (isMoving)
@@ -55,15 +55,17 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
         return false;
     }
 
-    public virtual void MoveCharacter(Vector3 point)
+    public virtual void MoveCharacter(GameObject point)
     {
         if (!isWork)
         {
+            _agent.isStopped = false;
+            controlRoom = point.GetComponent<Workroom>();
             PreviousRoom = CurrentRoom;
-            _destination = point;
+            _destination = point.transform.position;
             isMoving = true;
             _animator.SetTrigger("toWalk");
-            _agent.SetDestination(point);
+            _agent.SetDestination(_destination);
         }
     }
 
@@ -82,6 +84,11 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
         enemy = null;
     }
 
+    public void StopWalking()
+    {
+        LeaveRoom();
+        _agent.isStopped = true;
+    }
     public void FindEnemy()
     {
         if (CurrentRoom != null)
@@ -100,6 +107,8 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
 
     public void Work(float time)
     {
+        transform.position = _destination;
+        _animator.SetTrigger("toWork");
         StartCoroutine(WalkCoroutine(time));
     }
 
@@ -107,9 +116,9 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
     {
         isWork = true;
         yield return new WaitForSeconds(time);
-        Debug.Log("나가");
+        controlRoom.GetComponent<Workroom>().WorkResult();
         isWork = false;
-        MoveCharacter(PreviousRoom.transform.position);
+        MoveCharacter(PreviousRoom.gameObject);
     }
 }
 

@@ -5,5 +5,5 @@ using UnityEngine;
 public interface IRayInteraction
 {
     public bool RayInteract();
-    public void MoveCharacter(Vector3 point);
+    public void MoveCharacter(GameObject point);
 }

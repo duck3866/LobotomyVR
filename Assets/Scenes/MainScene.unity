@@ -1032,7 +1032,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 462d0a699d6c2ab45a15592f6aae8791, type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 1082271958561512970, guid: 462d0a699d6c2ab45a15592f6aae8791, type: 3}
       propertyPath: m_Layer
@@ -1280,6 +1280,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f617345b03978694490cac3b5d3b4bac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackPower: 0
+  attackDistance: 0
+  attackDelay: 0
+  room: {fileID: 0}
 --- !u!1 &541375774
 GameObject:
   m_ObjectHideFlags: 0
@@ -2494,6 +2498,7 @@ MonoBehaviour:
   isMoving: 0
   PreviousRoom: {fileID: 0}
   CurrentRoom: {fileID: 0}
+  controlRoom: {fileID: 0}
   isWork: 0
 --- !u!136 &1128196480
 CapsuleCollider:
@@ -2628,7 +2633,7 @@ MonoBehaviour:
   enemyList: []
   walkSpeed: 5
   isWalking: 0
-  enemyObject: {fileID: 0}
+  enemyObject: {fileID: 345276593}
   jailbreak: 0
 --- !u!1 &1273564480
 GameObject:

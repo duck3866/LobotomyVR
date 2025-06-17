@@ -28,9 +28,9 @@ public class HandPosition : MonoBehaviour
                     bool isOk = component.RayInteract();
                     if (selectCharacter != null && isOk)
                     {
-                        Vector3 position = new Vector3(hitInfo.point.x, 0, hitInfo.point.z);
+                        // Vector3 position = new Vector3(hitInfo.point.x, 0, hitInfo.point.z);
                         // selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(hitInfo.collider.bounds.center);
-                        selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(position);
+                        selectCharacter.GetComponent<IRayInteraction>().MoveCharacter(hitInfo.collider.gameObject);
                     }
                 }
             }

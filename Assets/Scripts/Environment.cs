@@ -10,7 +10,7 @@ public class Environment : MonoBehaviour, IRayInteraction
         return false;
     }
 
-    public void MoveCharacter(Vector3 point)
+    public void MoveCharacter(GameObject point)
     {
         
     }

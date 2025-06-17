@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Workroom : Room
 {
@@ -9,10 +11,24 @@ public class Workroom : Room
     [SerializeField] private bool isWalking = false; 
     // 작업 중
     [SerializeField] private GameObject enemyObject; // 관리중인 환상체
+    private Enemy _enemy;
     [SerializeField] private bool jailbreak = false;
+    public enum WorkResultEnum
+    {
+        High,
+        Middle,
+        Low
+    }
+    private void Start()
+    {
+        _enemy = enemyObject.GetComponent<Enemy>();
+        _enemy.InitRoom(this);
+    }
+
     public override void OnTriggerEnter(Collider other)
     {
         Debug.Log(other.gameObject.name);
+        if (jailbreak) return;
         if (!characterList.Contains(other.gameObject) && other.gameObject.CompareTag("Player"))
         {
             characterList.Add(other.gameObject);
@@ -20,6 +36,7 @@ public class Workroom : Room
             {
                 creature.EnterRoom(this.gameObject,true);
                 characterList[0].GetComponent<Employee>().Work(walkSpeed);
+                _enemy.EnterRoom();
             }
             isWalking = true;
         }
@@ -27,6 +44,7 @@ public class Workroom : Room
 
     public override void OnTriggerExit(Collider other)
     {
+        if (jailbreak) return;
         if (characterList.Contains(other.gameObject) && other.gameObject.CompareTag("Player"))
         {
             characterList.Remove(other.gameObject);
@@ -39,6 +57,11 @@ public class Workroom : Room
         
     }
 
+    public void WorkResult()
+    {
+        // int random = Random.Range(0, 3);
+        _enemy.WorkResult(WorkResultEnum.Low);
+    }
     public override bool RayInteract()
     {
         if (isWalking)

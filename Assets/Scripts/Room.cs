@@ -22,6 +22,10 @@ public class Room : MonoBehaviour, IRayInteraction
         if (!enemyList.Contains(other.gameObject) && other.gameObject.CompareTag("Enemy"))
         {
             enemyList.Add(other.gameObject);
+            foreach (var human in characterList)
+            {
+                human.GetComponent<Employee>().FindEnemy();
+            }
         }
     }
 
@@ -36,10 +40,16 @@ public class Room : MonoBehaviour, IRayInteraction
             }
             
         }
-        if (enemyList.Contains(other.gameObject) && other.gameObject.CompareTag("Enemy"))
-        {
-            enemyList.Remove(other.gameObject);
-        }
+        //todo: 방 나가도 계속 쫒아오는 문제 ㅎ결
+        // if (enemyList.Contains(other.gameObject) && other.gameObject.CompareTag("Enemy"))
+        // {
+        //     enemyList.Remove(other.gameObject);
+        //     foreach (var human in characterList)
+        //     {
+        //         human.GetComponent<Employee>().StopWalking();
+        //         // human.GetComponent<Employee>().LeaveRoom();
+        //     }
+        // }
     }
 
     public virtual bool RayInteract()
@@ -47,7 +57,7 @@ public class Room : MonoBehaviour, IRayInteraction
         return true;
     }
 
-    public void MoveCharacter(Vector3 point)
+    public void MoveCharacter(GameObject point)
     {
         
     }
