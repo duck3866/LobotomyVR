@@ -18,6 +18,10 @@ public class Room : MonoBehaviour, IRayInteraction
             {
                 creature.EnterRoom(this.gameObject,false);
             }
+            foreach (var human in characterList)
+            {
+                human.GetComponent<Employee>().FindEnemy();
+            }
         }
         if (!enemyList.Contains(other.gameObject) && other.gameObject.CompareTag("Enemy"))
         {
@@ -41,15 +45,10 @@ public class Room : MonoBehaviour, IRayInteraction
             
         }
         //todo: 방 나가도 계속 쫒아오는 문제 ㅎ결
-        // if (enemyList.Contains(other.gameObject) && other.gameObject.CompareTag("Enemy"))
-        // {
-        //     enemyList.Remove(other.gameObject);
-        //     foreach (var human in characterList)
-        //     {
-        //         human.GetComponent<Employee>().StopWalking();
-        //         // human.GetComponent<Employee>().LeaveRoom();
-        //     }
-        // }
+        if (enemyList.Contains(other.gameObject) && other.gameObject.CompareTag("Enemy"))
+        {
+            enemyList.Remove(other.gameObject);
+        }
     }
 
     public virtual bool RayInteract()

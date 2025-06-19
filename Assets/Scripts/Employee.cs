@@ -14,7 +14,7 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
     [SerializeField] private Room controlRoom; // 명령받은 방
     private bool _isCC = false; // CC기 걸렸는지 여부 
     [SerializeField] private bool isWork = false; // 일하고 있는지 여부
-    private GameObject enemy; // 추격 중인 적
+    [SerializeField] private GameObject enemy; // 추격 중인 적
     private void Start()
     {
         _animator = GetComponentInChildren<Animator>();
@@ -60,6 +60,7 @@ public class Employee : MonoBehaviour, IRayInteraction, ICreature
         if (!isWork)
         {
             _agent.isStopped = false;
+            LeaveRoom();
             controlRoom = point.GetComponent<Workroom>();
             PreviousRoom = CurrentRoom;
             _destination = point.transform.position;

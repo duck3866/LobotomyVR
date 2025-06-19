@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,17 +6,30 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private float attackPower;
-    [SerializeField] private float attackDistance;
-    [SerializeField] private float attackDelay;
-    [SerializeField] private Workroom room;
-    private Animator _animator;
-    private NavMeshAgent _navMeshAgent;
+    [SerializeField] protected float attackPower;
+    [SerializeField] protected float attackDistance;
+    [SerializeField] protected float attackDelay;
+    [SerializeField] protected float speed;
+    [SerializeField] protected float maxHp;
+    [SerializeField] protected Workroom room;
+    protected bool isJailBreak = false;
+    protected Animator _animator;
+    protected NavMeshAgent _navMeshAgent;
 
     private void Start()
     {
+        isJailBreak = false;
         _animator = GetComponent<Animator>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _navMeshAgent.speed = speed;
+    }
+
+    public virtual void Update()
+    {
+        if (isJailBreak)
+        {
+            
+        }
     }
 
     public virtual void InitRoom(Workroom room)

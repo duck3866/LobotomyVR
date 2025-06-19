@@ -12,7 +12,7 @@ public class Workroom : Room
     // 작업 중
     [SerializeField] private GameObject enemyObject; // 관리중인 환상체
     private Enemy _enemy;
-    [SerializeField] private bool jailbreak = false;
+    public bool jailbreak = false;
     public enum WorkResultEnum
     {
         High,
@@ -28,13 +28,13 @@ public class Workroom : Room
     public override void OnTriggerEnter(Collider other)
     {
         Debug.Log(other.gameObject.name);
-        if (jailbreak) return;
         if (!characterList.Contains(other.gameObject) && other.gameObject.CompareTag("Player"))
         {
             characterList.Add(other.gameObject);
             if (other.TryGetComponent<ICreature>(out ICreature creature))
             {
                 creature.EnterRoom(this.gameObject,true);
+                if (jailbreak) return;
                 characterList[0].GetComponent<Employee>().Work(walkSpeed);
                 _enemy.EnterRoom();
             }
@@ -44,7 +44,7 @@ public class Workroom : Room
 
     public override void OnTriggerExit(Collider other)
     {
-        if (jailbreak) return;
+        // if (jailbreak) return;
         if (characterList.Contains(other.gameObject) && other.gameObject.CompareTag("Player"))
         {
             characterList.Remove(other.gameObject);
@@ -57,6 +57,10 @@ public class Workroom : Room
         
     }
 
+    public void JailBreak()
+    {
+        jailbreak = true;
+    }
     public void WorkResult()
     {
         // int random = Random.Range(0, 3);
