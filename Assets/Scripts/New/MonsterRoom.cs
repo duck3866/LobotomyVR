@@ -3,36 +3,41 @@ using UnityEngine;
 
 public class MonsterRoom : MonoBehaviour
 {
-    [SerializeField] private bool isInRoom = false;
-    [SerializeField] private float count = 0;
-    public void PlayerInRoom()
+    [SerializeField] protected bool isInRoom = false;
+    [SerializeField] protected MasterRoom masterRoom;
+    public enum WorkResult
+    {
+        Good,
+        SoSo,
+        Bad
+    }
+
+    public enum WorkType
+    {
+        Instinct, // 본능
+        Attachment, // 애착
+        Insight, // 통찰
+        Suppression // 억압
+    }
+    public WorkResult result;
+    public WorkType workType;
+    public virtual void PlayerInRoom()
     {
         isInRoom = true;
-        count = 0f;
     }
 
-    public void Update()
+    public virtual void Update()
     {
-        if (count > 3)
-        {
-            Debug.Log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
-        }
+       
     }
 
-    private void OnBecameInvisible()
+    public virtual void PlayerOutRoom()
     {
-        if (isInRoom)
-        {
-            Debug.Log("OnBecameInvisible 호출됨");
-            count += 1;
-        }
+        isInRoom = false;
     }
 
-    private void OnBecameVisible()
+    public virtual void Result(WorkResult result)
     {
-        if (isInRoom)
-        {
-            Debug.Log("OnBecameVisible 호출됨");
-        }
+        
     }
 }

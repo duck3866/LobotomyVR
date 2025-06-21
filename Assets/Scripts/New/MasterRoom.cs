@@ -29,4 +29,13 @@ public class MasterRoom : MonoBehaviour
             monsterRoom.PlayerInRoom();
         }
     }
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            playerInRoom = false;
+            doorAnimator.SetTrigger("DoorToggle");
+            monsterRoom.PlayerOutRoom();
+        }
+    }
 }
