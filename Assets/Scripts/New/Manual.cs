@@ -7,9 +7,11 @@ public class Manual : MonoBehaviour
 {
     [SerializeField] private List<Sprite> images = new List<Sprite>();
     [SerializeField] private int pageIndex = 0;
-    [SerializeField] private int pageSize = 3;
+    [SerializeField] private int pageSize = 4;
     [SerializeField] private Image nowImage;
-    
+    /// <summary>
+    /// 페이지 넘김
+    /// </summary>
     public void OnClickPageUp()
     {
         pageIndex  = (pageIndex + 1) % pageSize;
