@@ -40,4 +40,9 @@ public class MonsterRoom : MonoBehaviour
     {
         
     }
+
+    public virtual void JailBreak()
+    {
+        masterRoom.doorAnimator.SetTrigger("DoorToggle");
+    }
 }

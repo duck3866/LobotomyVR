@@ -6,9 +6,7 @@ using UnityEngine.UI;
 public class MonsterTest : MonsterRoom
 {
     [SerializeField] private float count = 0;
-    // [SerializeField] private List<GameObject> manuals = new List<GameObject>();
-    // [SerializeField] private GameObject manualSpawnPoint;
-    // [SerializeField] private GameObject gageUI;
+ 
     [SerializeField] private float needItemCount = 3f;
     [SerializeField] private float nowItemCount = 0f; 
     
@@ -16,6 +14,7 @@ public class MonsterTest : MonsterRoom
     [SerializeField] private Image Image;
 
     [SerializeField] private int valueTest;
+    [SerializeField] private bool jailBreak = false; 
     public override void PlayerInRoom()
     {
         isInRoom = true;
@@ -28,7 +27,10 @@ public class MonsterTest : MonsterRoom
     {
         if (count > 3)
         {
-            Debug.Log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+            if (!jailBreak)
+            {
+                JailBreak();
+            }
         }
     }
     private void OnBecameInvisible()
@@ -77,15 +79,25 @@ public class MonsterTest : MonsterRoom
         if (result == WorkResult.Good)
         {
             Image.sprite = images[0];
+            GameManager.Instance.AddEnergy(10);
         }
         else if (result == WorkResult.SoSo)
         {
             Image.sprite = images[1];
+            GameManager.Instance.AddEnergy(5);
         }
         else
         {
             Image.sprite = images[2];
-            GetComponent<MeshRenderer>().enabled = false;
+            GameManager.Instance.AddEnergy(1);
         }
+    }
+
+    public override void JailBreak()
+    {
+        jailBreak = true;
+        GetComponent<MeshRenderer>().enabled = false;
+        masterRoom.doorAnimator.SetTrigger("DoorToggle");
+        GameManager.Instance.JailBreak();
     }
 }
