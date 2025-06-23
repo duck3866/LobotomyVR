@@ -1,10 +1,24 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MonsterRoom : MonoBehaviour
 {
     [SerializeField] protected bool isInRoom = false; // 플레이어가 방에 있는지 여부
     [SerializeField] protected MasterRoom masterRoom; // 자기가 연동된 방 클래스 (클리어 전달 용)
+    
+    [SerializeField] protected float needItemCount = 3f; // 줘야하는 아이템 개수
+    [SerializeField] protected float nowItemCount = 0f;  // 현재 아이템 개수
+    
+    [SerializeField] protected List<Sprite> images = new List<Sprite>(); // 작업 결과 이미지 리스트
+    [SerializeField] protected Image Image; // 작업 결과 이미지를 띄울 이미지 오브젝트
+    
+    [SerializeField] protected bool jailBreak = false; // 탈출 여부
+
+    [SerializeField] protected int valueTest; // 통찰 작업 결과 대조 값
+    
+    private Vector3 _startPosition; // 시작 위치
     public enum WorkResult // 작업 결과 이넘
     {
         Good,
@@ -22,6 +36,10 @@ public class MonsterRoom : MonoBehaviour
     public WorkResult result; // 현재 작업 결과
     public WorkType workType; // 현재 작업 타입
     
+    public void Start()
+    {
+        _startPosition = transform.position;
+    }
     /// <summary>
     /// 플레이어가 방에 들어왔을때 초기화 하는 함수
     /// </summary>
@@ -58,5 +76,22 @@ public class MonsterRoom : MonoBehaviour
     public virtual void ClickButtonManual(int value)
     {
 
+    }
+    /// <summary>
+    /// 환상체 제압될때 호출되어 초기화 하는 함수
+    /// </summary>
+    public virtual void Subdued()
+    {
+        jailBreak = false;
+        GameManager.Instance.ClearJailBreak(this);
+    }
+    
+    /// <summary>
+    /// 환상체 재소환
+    /// </summary>
+    public void Respawn()
+    {
+        jailBreak = false;
+        transform.position = _startPosition;
     }
 }

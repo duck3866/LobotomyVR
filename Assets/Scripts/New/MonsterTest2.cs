@@ -1,54 +1,25 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class MonsterTest : MonsterRoom
+public class MonsterTest2 : MonsterRoom
 {
-    [SerializeField] private float count = 0; // 시선이 밖으로 나간 횟수
-
+    public enum MonsterState
+    {
+        Move,
+        Attack,
+        Damaged,
+        Die
+    }
+    private MonsterState state = MonsterState.Move;
+    
     /// <summary>
     /// 플레이어가 들어왔을때
     /// </summary>
     public override void PlayerInRoom()
     {
         isInRoom = true;
-        // workType = WorkType.Instinct;
-        count = 0f;
-    }
-    
-    public void Update()
-    {
-        if (count > 3)
-        {
-            if (!jailBreak)
-            {
-                JailBreak();
-            }
-        }
-    }
-    /// <summary>
-    /// 시선이 안으로 들어옴
-    /// </summary>
-    private void OnBecameInvisible()
-    {
-        if (isInRoom)
-        {
-            Debug.Log("OnBecameInvisible 호출됨");
-            count += 1;
-        }
-    }
-    /// <summary>
-    /// 시선이 밖으로 들어옴
-    /// </summary>
-    private void OnBecameVisible()
-    {
-        if (isInRoom)
-        {
-            Debug.Log("OnBecameVisible 호출됨");
-        }
-    }
+    }        
     /// <summary>
     /// 통찰 작업
     /// </summary>
@@ -114,9 +85,7 @@ public class MonsterTest : MonsterRoom
     /// </summary>
     public override void JailBreak()
     {
-        count = 0;
         jailBreak = true;
-        GetComponent<MeshRenderer>().enabled = false;
         masterRoom.doorAnimator.SetTrigger("DoorToggle");
         GameManager.Instance.JailBreak(this);
     }
