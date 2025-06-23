@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MonsterRoom : MonoBehaviour
+public class MonsterRoom : MonoBehaviour, IDamagable
 {
     [SerializeField] protected bool isInRoom = false; // 플레이어가 방에 있는지 여부
     [SerializeField] protected MasterRoom masterRoom; // 자기가 연동된 방 클래스 (클리어 전달 용)
@@ -14,11 +15,12 @@ public class MonsterRoom : MonoBehaviour
     [SerializeField] protected List<Sprite> images = new List<Sprite>(); // 작업 결과 이미지 리스트
     [SerializeField] protected Image Image; // 작업 결과 이미지를 띄울 이미지 오브젝트
     
-    [SerializeField] protected bool jailBreak = false; // 탈출 여부
+    public bool jailBreak = false; // 탈출 여부
 
     [SerializeField] protected int valueTest; // 통찰 작업 결과 대조 값
     
-    private Vector3 _startPosition; // 시작 위치
+    public Vector3 startPosition; // 시작 위치
+    public Vector3 startRotation; // 시작 위치
     public enum WorkResult // 작업 결과 이넘
     {
         Good,
@@ -36,9 +38,56 @@ public class MonsterRoom : MonoBehaviour
     public WorkResult result; // 현재 작업 결과
     public WorkType workType; // 현재 작업 타입
     
-    public void Start()
+    #region FSM
+    
+    public enum MonsterState
     {
-        _startPosition = transform.position;
+        Move,
+        Attack,
+        Die
+    }
+    public MonsterState state = MonsterState.Move;
+    // public virtual void Update()
+    // {
+    //     switch (state)
+    //     {
+    //         case MonsterState.Move:
+    //             Move();
+    //             break;
+    //         case MonsterState.Attack:
+    //             Attack();
+    //             break;
+    //         case MonsterState.Damaged:
+    //             Damage();
+    //             break;
+    //         case MonsterState.Die:
+    //             Die();
+    //             break;
+    //     }
+    // }
+
+    public virtual void Move()
+    {
+            
+    }
+
+    public virtual void Attack()
+    {
+            
+    }
+    public virtual void TakeDamage(float damage,  GameObject attacker)
+    {
+        
+    }
+    public virtual void Die()
+    {
+            
+    }
+    #endregion
+    public virtual void Start()
+    {
+        startPosition = transform.position;
+        startRotation =  transform.eulerAngles;
     }
     /// <summary>
     /// 플레이어가 방에 들어왔을때 초기화 하는 함수
@@ -89,9 +138,17 @@ public class MonsterRoom : MonoBehaviour
     /// <summary>
     /// 환상체 재소환
     /// </summary>
-    public void Respawn()
+    public virtual void Respawn()
     {
         jailBreak = false;
-        transform.position = _startPosition;
+        Image.sprite = images[3];
+        transform.eulerAngles = startRotation;
+        transform.position = startPosition;
+        masterRoom.InitializeRoom();
+    }
+    protected IEnumerator WaitSpawn(float time)
+    {
+        yield return new WaitForSeconds(time);
+        Respawn();
     }
 }

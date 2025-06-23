@@ -1,17 +1,145 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class MonsterTest2 : MonsterRoom
 {
-    public enum MonsterState
+    public float chaseDistance;
+    public float attackDistance;
+    public float attackDelay;
+    private float nowAttackDelay;
+    public float attackPower;
+    public float maxHp;
+    public float hp;
+    public float moveSpeed;
+    public GameObject direction;
+    private NavMeshAgent agent;
+    private Animator animator;
+
+    public override void Start()
     {
-        Move,
-        Attack,
-        Damaged,
-        Die
+        startPosition = transform.position;
+        startRotation =  transform.eulerAngles;
+        agent = GetComponent<NavMeshAgent>();
+        animator  = GetComponentInChildren<Animator>();
+        agent.speed = moveSpeed;
+        hp = maxHp;
     }
-    private MonsterState state = MonsterState.Move;
+    public virtual void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            JailBreak();
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            TakeDamage(5f,this.gameObject);
+        }
+        if (jailBreak)
+        {
+            Debug.Log("jailBreak");
+            switch (state)
+            {
+                case MonsterState.Move:
+                    Move();
+                    break;
+                case MonsterState.Attack:
+                    Attack();
+                    break;
+                case MonsterState.Die:
+                    Die();
+                    break;
+            }
+        }
+    }
+
+    public override void Move()
+    {
+        if (direction == null)
+        {
+            GameObject[] player = GameObject.FindGameObjectsWithTag("Player");
+            GameObject target = null;
+            float distance = float.MaxValue;
+            foreach (var findPlayer in player)
+            {
+                if (Vector3.Distance(transform.position, findPlayer.transform.position) < distance)
+                {
+                    target = findPlayer;
+                    distance = Vector3.Distance(transform.position, findPlayer.transform.position);
+                }
+            }
+            Debug.Log("끄아아아악"+target);
+            if (target != null)
+            {
+                direction = target;
+                animator.SetTrigger("toRun");
+            }
+        }
+        else
+        {
+            // if (Vector3.Distance(transform.position,direction.transform.position) > chaseDistance)
+            // {
+            //     direction = null;
+            //     return;
+            // }
+            if (Vector3.Distance(transform.position,direction.transform.position) > attackDistance)
+            {
+                agent.SetDestination(direction.transform.position);   
+            }
+            else
+            {
+                state = MonsterState.Attack;
+            }
+        }
+    }
+
+    public override void Attack()
+    {
+        if (Vector3.Distance(transform.position,direction.transform.position) <= attackDistance)
+        {
+            if (nowAttackDelay >= attackDelay)
+            {
+                animator.SetTrigger("toAttack");
+                nowAttackDelay = 0;
+            }
+            else
+            {
+                nowAttackDelay += Time.deltaTime;
+            }   
+        }
+        else
+        {
+            state = MonsterState.Move;
+            animator.SetTrigger("toRun");
+            nowAttackDelay = 0;
+        }
+    }
+
+    public override void TakeDamage(float damage,  GameObject attacker)
+    {
+        if (attacker != direction)
+        {
+            direction = attacker;
+        }
+
+        hp -= damage;
+        if (hp <= 0)
+        {
+            state = MonsterState.Die;
+        }
+    }
+
+    public override void Die()
+    {
+        agent.isStopped = true;
+        animator.SetTrigger("toDie");
+        Subdued();
+        StartCoroutine(WaitSpawn(5f));
+    }
     
     /// <summary>
     /// 플레이어가 들어왔을때
@@ -86,7 +214,21 @@ public class MonsterTest2 : MonsterRoom
     public override void JailBreak()
     {
         jailBreak = true;
+        state = MonsterState.Move;
         masterRoom.doorAnimator.SetTrigger("DoorToggle");
         GameManager.Instance.JailBreak(this);
+        agent.isStopped = false;
+    }
+    public override void Respawn()
+    {
+        jailBreak = false;
+        direction = null;
+        Image.sprite = images[3];
+        masterRoom.InitializeRoom();
+        transform.position = startPosition;
+        transform.eulerAngles = startRotation;
+        hp = maxHp;
+        agent.speed = moveSpeed;
+        animator.SetTrigger("toIdle");
     }
 }

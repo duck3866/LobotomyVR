@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
     /// <param name="energy"></param>
     public void AddEnergy(int energy)
     {
-        needEnergy += energy;
+        nowEnergy += energy;
         energySlider.value = nowEnergy / needEnergy;
     }
     /// <summary>

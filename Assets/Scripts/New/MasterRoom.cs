@@ -8,6 +8,13 @@ public class MasterRoom : MonoBehaviour
     public bool playerInRoom = false;
     public bool isClear = false;
     public MonsterRoom monsterRoom;
+
+    public void InitializeRoom()
+    {
+        isClear = false;
+        playerInRoom = false;
+        doorAnimator.SetTrigger("CloseDoor");
+    }
     /// <summary>
     /// 문을 열고 닫는 함수
     /// </summary>
@@ -31,6 +38,7 @@ public class MasterRoom : MonoBehaviour
     /// <param name="other"></param>
     public void OnTriggerEnter(Collider other)
     {
+        if (monsterRoom.jailBreak) return;
         if (other.gameObject.CompareTag("Player"))
         {
             playerInRoom = true;
@@ -45,6 +53,7 @@ public class MasterRoom : MonoBehaviour
     /// <param name="other"></param>
     public void OnTriggerExit(Collider other)
     {
+        if (monsterRoom.jailBreak) return;
         if (other.gameObject.CompareTag("Player"))
         {
             playerInRoom = false;
