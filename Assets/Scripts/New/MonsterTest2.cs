@@ -41,7 +41,7 @@ public class MonsterTest2 : MonsterRoom
         }
         if (jailBreak)
         {
-            Debug.Log("jailBreak");
+            // Debug.Log("jailBreak");
             switch (state)
             {
                 case MonsterState.Move:

@@ -8,6 +8,10 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    public AudioManager audioManager;
+    public AudioClip bgmClip;
+    public AudioClip sirenClip;
+    [Range(0,100)] public float BGMVolume;
     public Slider energySlider;
     
     public float needEnergy;
@@ -27,14 +31,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // public void Update()
-    // {
-    //     if (Input.GetMouseButtonDown(0))
-    //     {
-    //         JailBreak();
-    //     }
-    // }
-    
+    public void Start()
+    {
+        audioManager.PlayBackgroundMusic(bgmClip,1f);
+    }
+
     /// <summary>
     /// 작업 에너지 추가 
     /// </summary>
@@ -58,6 +59,7 @@ public class GameManager : MonoBehaviour
         {
             siren.StartSiren();
         }
+        audioManager.PlayBackgroundMusic(sirenClip,BGMVolume);
     }
     /// <summary>
     /// 사이렌 끄는 함수 환상체가 전부 제압될때 꺼짐
@@ -76,6 +78,7 @@ public class GameManager : MonoBehaviour
             {
                 siren.EndSiren();
             }   
+            audioManager.PlayBackgroundMusic(bgmClip,BGMVolume);
         }
     }
     /// <summary>
