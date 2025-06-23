@@ -79,6 +79,12 @@ public class MonsterRoom : MonoBehaviour, IDamagable
     {
         
     }
+
+    public virtual void TakeDamage(float damage)
+    {
+        
+    }
+
     public virtual void Die()
     {
             

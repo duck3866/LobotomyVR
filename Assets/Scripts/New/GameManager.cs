@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +17,8 @@ public class GameManager : MonoBehaviour
     
     public float needEnergy;
     public float nowEnergy;
-    
+    [SerializeField] private TextMeshProUGUI liveHumanText;
+    [SerializeField] private List<GameObject> humanObjects;
     [SerializeField] private List<Siren> sirens;
     [SerializeField] private List<MonsterRoom> monsterRooms = new List<MonsterRoom>();
     public void Awake()
@@ -44,6 +46,15 @@ public class GameManager : MonoBehaviour
     {
         nowEnergy += energy;
         energySlider.value = nowEnergy / needEnergy;
+    }
+    /// <summary>
+    /// 직원 죽었을때 발동하는 함수
+    /// </summary>
+    /// <param name="human"></param>
+    public void DeleteHumans(GameObject human)
+    {
+        humanObjects.Remove(human);
+        liveHumanText.text = "People:"+humanObjects.Count;
     }
     /// <summary>
     /// 사이렌 키는 함수 환상체 탈출할때 호출

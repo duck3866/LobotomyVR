@@ -99,11 +99,17 @@ public class MonsterTest2 : MonsterRoom
 
     public override void Attack()
     {
+        if (direction == null)
+        {
+            state = MonsterState.Move;
+            return;
+        }
         if (Vector3.Distance(transform.position,direction.transform.position) <= attackDistance)
         {
             if (nowAttackDelay >= attackDelay)
             {
                 animator.SetTrigger("toAttack");
+                direction.GetComponent<IDamagable>().TakeDamage(attackPower);
                 nowAttackDelay = 0;
             }
             else
