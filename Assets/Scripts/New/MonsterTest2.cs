@@ -109,7 +109,7 @@ public class MonsterTest2 : MonsterRoom
             if (nowAttackDelay >= attackDelay)
             {
                 animator.SetTrigger("toAttack");
-                direction.GetComponent<IDamagable>().TakeDamage(attackPower);
+                direction.GetComponent<IDamagable>().TakeDamage(attackPower,this.gameObject);
                 nowAttackDelay = 0;
             }
             else

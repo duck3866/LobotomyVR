@@ -14,6 +14,7 @@ public class Human : MonoBehaviour, IDamagable
         Panic
     }
     public HumanState state =  HumanState.Idle;
+    public LayerMask panicLayer;
     
     public float moveSpeed;
     public float maxHp;
@@ -86,11 +87,61 @@ public class Human : MonoBehaviour, IDamagable
 
     public void Panic()
     {
-        
+        if (targetMonster == null)
+        {
+            Collider[] colliders = new Collider[5];
+            int count = Physics.OverlapSphereNonAlloc(transform.position, 3f, colliders, panicLayer.value);
+
+            GameObject closest = null;
+            float minDist = float.MaxValue;
+
+            for (int i = 0; i < count; i++)
+            {
+                if (colliders[i].gameObject != this.gameObject)
+                {
+                    float dist = Vector3.Distance(transform.position, colliders[i].transform.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        closest = colliders[i].gameObject;
+                    }
+                }
+            }
+
+            if (closest != null)
+            {
+                targetMonster = closest;
+                animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
+            }
+        }
+        else
+        {
+            Vector3 runDirection = (transform.position - targetMonster.transform.position).normalized;
+            Vector3 runTo = transform.position + runDirection * 5f; // 5m 거리로 도망
+
+            agent.SetDestination(runTo);
+        }
     }
+
     public void TakeDamage(float damage, GameObject attacker)
     {
-        
+        if (isDie) return;
+        targetMonster = attacker;
+        hp -= damage;
+        if (hp <= 0)
+        {
+            GameManager.Instance.DeleteHumans(this.gameObject);
+            state = HumanState.Die;
+            isDie  = true;
+            agent.isStopped = true;
+            animator.SetTrigger("toDie");
+            Destroy(gameObject,3f);
+        }
+        else
+        {
+            animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
+            state = HumanState.Panic;
+        }
     }
 
     public void FindMonster()
@@ -100,15 +151,6 @@ public class Human : MonoBehaviour, IDamagable
     }
     public void TakeDamage(float damage)
     {
-        if (isDie) return;
-        hp -= damage;
-        if (hp <= 0)
-        {
-            GameManager.Instance.DeleteHumans(this.gameObject);
-            state = HumanState.Die;
-            isDie  = true;
-            animator.SetTrigger("toDie");
-            Destroy(gameObject,3f);
-        }
+        
     }
 }
