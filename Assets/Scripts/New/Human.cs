@@ -13,12 +13,17 @@ public class Human : MonoBehaviour, IDamagable
         Die,
         Panic
     }
+    
     public HumanState state =  HumanState.Idle;
     public LayerMask panicLayer;
     
     public float moveSpeed;
+    
     public float maxHp;
     public float hp;
+    public float maxMental;
+    public float mental;
+    
     public float attackDelay;
     public float attackDistance;
     public float attackPower;
@@ -39,6 +44,8 @@ public class Human : MonoBehaviour, IDamagable
     public void Initialize()
     {
         hp = maxHp;
+        mental = maxMental;
+        currentDelay = 0;
         agent.speed = moveSpeed;
         isDie = false;
     }
@@ -72,12 +79,42 @@ public class Human : MonoBehaviour, IDamagable
 
     public void Move()
     {
-        
+        if (targetMonster == null)
+        {
+            return;
+        }
+        else if (Vector3.Distance(transform.position, targetMonster.transform.position) < attackDistance)
+        {
+            agent.isStopped = true;
+            attackDelay = 0;
+            state = HumanState.Attack;
+        }
+        else
+        {
+            agent.SetDestination(targetMonster.transform.position);
+        }
     }
-
+    
     public void Attack()
     {
-        
+        if (Vector3.Distance(transform.position, targetMonster.transform.position) <= attackDistance)
+        {
+            if (currentDelay >= attackDelay)
+            {
+                animator.SetTrigger("toAttack");
+                targetMonster.GetComponent<IDamagable>().TakeDamage(attackPower);
+                currentDelay = 0;
+            }
+            else
+            {
+                currentDelay += Time.deltaTime;
+            }   
+        }
+        else
+        {
+            animator.SetTrigger("toWalk");
+            state = HumanState.Move;
+        }
     }
 
     public void Die()
@@ -127,6 +164,7 @@ public class Human : MonoBehaviour, IDamagable
     {
         if (isDie) return;
         targetMonster = attacker;
+        mental -= damage * 2;
         hp -= damage;
         if (hp <= 0)
         {
@@ -135,18 +173,30 @@ public class Human : MonoBehaviour, IDamagable
             isDie  = true;
             agent.isStopped = true;
             animator.SetTrigger("toDie");
-            Destroy(gameObject,3f);
+            agent.isStopped = true;
+            Destroy(gameObject,30f);
+        }
+        else if(mental <= 0)
+        {
+            state = HumanState.Panic;
+            agent.isStopped = false;
+            animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
         }
         else
         {
-            animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
-            state = HumanState.Panic;
+            if (state != HumanState.Move)
+            {
+                state = HumanState.Move;
+                agent.isStopped = false;
+                animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
+            }
         }
     }
 
     public void FindMonster()
     {
         state = HumanState.Move;
+        agent.isStopped = false;
         animator.SetTrigger("toWalk");
     }
     public void TakeDamage(float damage)

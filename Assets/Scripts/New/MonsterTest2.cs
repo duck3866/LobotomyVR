@@ -66,6 +66,10 @@ public class MonsterTest2 : MonsterRoom
             float distance = float.MaxValue;
             foreach (var findPlayer in player)
             {
+                // if (findPlayer.gameObject.name == "Player")
+                // {
+                //     return;
+                // }
                 if (Vector3.Distance(transform.position, findPlayer.transform.position) < distance)
                 {
                     target = findPlayer;
@@ -212,6 +216,7 @@ public class MonsterTest2 : MonsterRoom
         {
             Image.sprite = images[2];
             GameManager.Instance.AddEnergy(1);
+            JailBreak();
         }
     }
     /// <summary>

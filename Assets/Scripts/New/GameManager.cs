@@ -14,13 +14,17 @@ public class GameManager : MonoBehaviour
     public AudioClip sirenClip;
     [Range(0,100)] public float BGMVolume;
     public Slider energySlider;
-    
+
+    public Animator doorAnimator_L;
+    public Animator doorAnimator_R;
+
     public float needEnergy;
     public float nowEnergy;
     [SerializeField] private TextMeshProUGUI liveHumanText;
     [SerializeField] private List<GameObject> humanObjects;
     [SerializeField] private List<Siren> sirens;
     [SerializeField] private List<MonsterRoom> monsterRooms = new List<MonsterRoom>();
+    private bool jailBreak = false;
     public void Awake()
     {
         if (Instance == null)
@@ -35,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
+        jailBreak = false;
         audioManager.PlayBackgroundMusic(bgmClip,1f);
     }
 
@@ -66,11 +71,17 @@ public class GameManager : MonoBehaviour
         {
             monsterRooms.Add(monsterRoom);
         }
-        foreach (var siren in sirens)
+        if (!jailBreak)
         {
-            siren.StartSiren();
+            foreach (var siren in sirens)
+            {
+                siren.StartSiren();
+            }
+            doorAnimator_L.SetTrigger("OpenDoor");
+            doorAnimator_R.SetTrigger("OpenDoor");
+            audioManager.PlayBackgroundMusic(sirenClip,BGMVolume);
         }
-        audioManager.PlayBackgroundMusic(sirenClip,BGMVolume);
+        jailBreak = true;
     }
     /// <summary>
     /// 사이렌 끄는 함수 환상체가 전부 제압될때 꺼짐
@@ -90,6 +101,10 @@ public class GameManager : MonoBehaviour
                 siren.EndSiren();
             }   
             audioManager.PlayBackgroundMusic(bgmClip,BGMVolume);
+            
+            doorAnimator_L.SetTrigger("CloseDoor");
+            doorAnimator_R.SetTrigger("CloseDoor");
+            jailBreak = false;
         }
     }
     /// <summary>

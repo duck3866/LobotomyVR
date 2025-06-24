@@ -42,11 +42,13 @@ public class MonsterRoom : MonoBehaviour, IDamagable
     
     public enum MonsterState
     {
+        Idle,
         Move,
         Attack,
         Die
     }
     public MonsterState state = MonsterState.Move;
+    
     // public virtual void Update()
     // {
     //     switch (state)
@@ -65,7 +67,10 @@ public class MonsterRoom : MonoBehaviour, IDamagable
     //             break;
     //     }
     // }
-
+    public virtual void Idle()
+    {
+        
+    }
     public virtual void Move()
     {
             
