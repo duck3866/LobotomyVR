@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MonsterTest : MonsterRoom
@@ -46,16 +47,6 @@ public class MonsterTest : MonsterRoom
             {
                 JailBreak();
             }   
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            JailBreak();
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            TakeDamage(100,gameObject);
         }
     }
 

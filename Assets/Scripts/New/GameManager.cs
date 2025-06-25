@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<GameObject> humanObjects;
     [SerializeField] private List<Siren> sirens;
     [SerializeField] private List<MonsterRoom> monsterRooms = new List<MonsterRoom>();
+
+    [SerializeField] private GameObject report;
+    [SerializeField] private TextMeshProUGUI reportRank;
     private bool jailBreak = false;
     public void Awake()
     {
@@ -51,6 +54,10 @@ public class GameManager : MonoBehaviour
     {
         nowEnergy += energy;
         energySlider.value = nowEnergy / needEnergy;
+        if (nowEnergy >= needEnergy)
+        {
+            ClearGame();
+        }
     }
     /// <summary>
     /// 직원 죽었을때 발동하는 함수
@@ -128,6 +135,18 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void ClearGame()
     {
-        
+        report.SetActive(true);
+        switch (humanObjects.Count)
+        {
+            case 3:
+                reportRank.text = "A";
+                break;
+            case 2:
+                reportRank.text = "B";
+                break;
+            default:
+                reportRank.text = "C";
+                break;
+        }
     }
 }
