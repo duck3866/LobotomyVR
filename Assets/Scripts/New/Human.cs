@@ -13,17 +13,16 @@ public class Human : MonoBehaviour, IDamagable
         Die,
         Panic
     }
-    
-    public HumanState state =  HumanState.Idle;
+
+    public HumanState state = HumanState.Idle;
     public LayerMask panicLayer;
-    
+
     public float moveSpeed;
-    
     public float maxHp;
     public float hp;
     public float maxMental;
     public float mental;
-    
+
     public float attackDelay;
     public float attackDistance;
     public float attackPower;
@@ -41,6 +40,7 @@ public class Human : MonoBehaviour, IDamagable
         agent = GetComponentInChildren<NavMeshAgent>();
         Initialize();
     }
+
     public void Initialize()
     {
         hp = maxHp;
@@ -74,7 +74,7 @@ public class Human : MonoBehaviour, IDamagable
 
     public void Idle()
     {
-        
+        // 대기 상태 처리 (필요시 애니메이션 등)
     }
 
     public void Move()
@@ -83,32 +83,43 @@ public class Human : MonoBehaviour, IDamagable
         {
             return;
         }
-        else if (Vector3.Distance(transform.position, targetMonster.transform.position) < attackDistance)
+
+        if (Vector3.Distance(transform.position, targetMonster.transform.position) < attackDistance)
         {
             agent.isStopped = true;
-            attackDelay = 0;
             state = HumanState.Attack;
+            currentDelay = attackDelay; // 즉시 공격 가능하게
         }
         else
         {
+            agent.isStopped = false;
             agent.SetDestination(targetMonster.transform.position);
         }
     }
-    
+
     public void Attack()
     {
-        if (Vector3.Distance(transform.position, targetMonster.transform.position) <= attackDistance)
+        if (targetMonster == null) return;
+
+        float distance = Vector3.Distance(transform.position, targetMonster.transform.position);
+
+        if (distance <= attackDistance)
         {
+            agent.isStopped = true;
+
             if (currentDelay >= attackDelay)
             {
+                Vector3 direction = (targetMonster.transform.position - transform.position).normalized;
+                transform.forward = direction;
                 animator.SetTrigger("toAttack");
-                targetMonster.GetComponent<IDamagable>().TakeDamage(attackPower);
-                currentDelay = 0;
+                targetMonster.GetComponent<IDamagable>().TakeDamage(attackPower,gameObject);
+                Debug.Log("딜이 안드가잖아");
+                currentDelay = 0f;
             }
             else
             {
                 currentDelay += Time.deltaTime;
-            }   
+            }
         }
         else
         {
@@ -119,7 +130,7 @@ public class Human : MonoBehaviour, IDamagable
 
     public void Die()
     {
-      
+        // 죽음 상태 처리
     }
 
     public void Panic()
@@ -148,14 +159,13 @@ public class Human : MonoBehaviour, IDamagable
             if (closest != null)
             {
                 targetMonster = closest;
-                animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
+                animator.SetTrigger("toWalk");
             }
         }
         else
         {
             Vector3 runDirection = (transform.position - targetMonster.transform.position).normalized;
-            Vector3 runTo = transform.position + runDirection * 5f; // 5m 거리로 도망
-
+            Vector3 runTo = transform.position + runDirection * 5f;
             agent.SetDestination(runTo);
         }
     }
@@ -163,24 +173,40 @@ public class Human : MonoBehaviour, IDamagable
     public void TakeDamage(float damage, GameObject attacker)
     {
         if (isDie) return;
-        targetMonster = attacker;
-        mental -= damage * 2;
+
         hp -= damage;
+        mental -= damage * 2;
+        targetMonster = attacker;
+
         if (hp <= 0)
         {
+            gameObject.tag = "Die";
             GameManager.Instance.DeleteHumans(this.gameObject);
             state = HumanState.Die;
-            isDie  = true;
+            isDie = true;
             agent.isStopped = true;
+            animator.ResetTrigger("toAttack");
             animator.SetTrigger("toDie");
-            agent.isStopped = true;
-            Destroy(gameObject,30f);
+            targetMonster.GetComponentInChildren<MonsterRoom>().HumanDie();
+            return;
         }
-        else if(mental <= 0)
+
+        if (mental <= 0)
         {
             state = HumanState.Panic;
             agent.isStopped = false;
-            animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
+            animator.SetTrigger("toWalk");
+            return;
+        }
+
+        float distance = Vector3.Distance(transform.position, targetMonster.transform.position);
+        if (distance <= attackDistance)
+        {
+            state = HumanState.Attack;
+            agent.isStopped = true;
+            currentDelay = attackDelay;
+            animator.ResetTrigger("toWalk");
+            animator.SetTrigger("toAttack");
         }
         else
         {
@@ -188,19 +214,30 @@ public class Human : MonoBehaviour, IDamagable
             {
                 state = HumanState.Move;
                 agent.isStopped = false;
-                animator.SetTrigger("toWalk"); // 필요 시 애니메이션 트리거
+                animator.SetTrigger("toWalk");
             }
         }
     }
 
-    public void FindMonster()
+    public void FindMonster(GameObject monster)
     {
+        targetMonster = monster;
         state = HumanState.Move;
         agent.isStopped = false;
         animator.SetTrigger("toWalk");
     }
+
+    public void ResetTarget(GameObject target)
+    {
+        if (target == targetMonster)
+        {
+            targetMonster = null;
+            animator.SetTrigger("toIdle");
+            agent.isStopped = true;
+        }
+    }
     public void TakeDamage(float damage)
     {
-        
+        // IDamagable 인터페이스 구현용
     }
 }

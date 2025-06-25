@@ -30,15 +30,7 @@ public class MonsterTest2 : MonsterRoom
     }
     public virtual void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            JailBreak();
-        }
 
-        if (Input.GetMouseButtonDown(1))
-        {
-            TakeDamage(5f,this.gameObject);
-        }
         if (jailBreak)
         {
             // Debug.Log("jailBreak");
@@ -143,6 +135,11 @@ public class MonsterTest2 : MonsterRoom
         }
     }
 
+    public override void HumanDie()
+    {
+        Debug.Log("Test!!!!!!!!!!!!!!!!!!!!!!!!");
+        direction = null;
+    }
     public override void Die()
     {
         agent.isStopped = true;

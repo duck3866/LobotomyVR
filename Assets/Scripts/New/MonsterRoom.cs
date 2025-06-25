@@ -94,6 +94,11 @@ public class MonsterRoom : MonoBehaviour, IDamagable
     {
             
     }
+
+    public virtual void HumanDie()
+    {
+        
+    }
     #endregion
     public virtual void Start()
     {
@@ -142,6 +147,7 @@ public class MonsterRoom : MonoBehaviour, IDamagable
     /// </summary>
     public virtual void Subdued()
     {
+        MonsterDie();
         jailBreak = false;
         GameManager.Instance.ClearJailBreak(this);
     }
@@ -161,5 +167,10 @@ public class MonsterRoom : MonoBehaviour, IDamagable
     {
         yield return new WaitForSeconds(time);
         Respawn();
+    }
+
+    public void MonsterDie()
+    {
+        GameManager.Instance.MonsterDie(gameObject);   
     }
 }

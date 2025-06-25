@@ -9,13 +9,12 @@ public class Weapon : MonoBehaviour
    public GameObject attacker;
    public void OnTriggerStay(Collider other)
    {
-      // Debug.Log(other.gameObject.name);
+      Debug.Log("???/dsdadqdqdqdasnacaoc l");
       if (other.gameObject.CompareTag("Enemy"))
       {
          Debug.Log("아니 이거 뭔데!");
          if (other.TryGetComponent(out IDamagable damagable))
          {
-            Debug.Log(damagable + " 으아 시이이이발");
             damagable.TakeDamage(5f,attacker);
          }
       }

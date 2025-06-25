@@ -8,28 +8,24 @@ using UnityEngine.UI;
 public class MonsterTest : MonsterRoom
 {
     [SerializeField] private float count = 0; // 시선이 밖으로 나간 횟수
-    public float chaseDistance;
-    public float attackDistance;
-    public float attackDelay;
-    private float nowAttackDelay;
+    [SerializeField] private GameObject parent;
     public float attackPower;
     public float maxHp;
     public float hp;
-    public float moveSpeed;
+    
     public GameObject direction;
-    private NavMeshAgent agent;
+   
     private Animator animator;
 
-    private bool isStart = false;
-    private bool isAttacking = false;
+    private bool test = false;
 
     public override void Start()
     {
-        startPosition = transform.position;
-        startRotation =  transform.eulerAngles;
-        agent = GetComponent<NavMeshAgent>();
+        startPosition = parent.transform.position;
+        startRotation =  parent.transform.eulerAngles;
+        
         animator  = GetComponentInChildren<Animator>();
-        agent.speed = moveSpeed;
+        
         hp = maxHp;
     }
     /// <summary>
@@ -51,39 +47,32 @@ public class MonsterTest : MonsterRoom
                 JailBreak();
             }   
         }
-        else
+
+        if (Input.GetMouseButtonDown(0))
         {
-            if (count > 3)
-            {
-                isAttacking = false;
-            }
-            switch (state)
-            {
-                case MonsterState.Idle:
-                    Idle();
-                    break;
-                case MonsterState.Move:
-                    Move();
-                    break;
-                case MonsterState.Attack:
-                    Attack();
-                    break;
-                case MonsterState.Die:
-                    Die();
-                    break;
-            }
+            JailBreak();
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            TakeDamage(100,gameObject);
         }
     }
 
-    public override void Idle()
+    private IEnumerator WaitAttack()
     {
-        if (isStart)
-        {
-            state = MonsterState.Move;
-        }
+        animator.SetTrigger("toAttack");
+        yield return new WaitForSeconds(0.9f);
+        Move();
+    }
+    private IEnumerator WaitLook()
+    {
+        yield return new WaitForSeconds(3f);
+        test = true;
     }
     public override void Move()
     {
+        if (hp <= 0) return;
         if (direction == null)
         {
             GameObject[] player = GameObject.FindGameObjectsWithTag("Player");
@@ -101,51 +90,30 @@ public class MonsterTest : MonsterRoom
             if (target != null)
             {
                 direction = target;
-                // animator.SetTrigger("toRun");
-            }
-        }
-        else
-        {
-            state = MonsterState.Attack;
-        }
-    }
-
-    public override void Attack()
-    {
-        if (direction == null)
-        {
-            state = MonsterState.Move;
-            return;
-        }
-        if (!isAttacking)
-        {
-            transform.position = new Vector3(direction.transform.position.x,transform.position.y,direction.transform.position.z);
-            if (direction.TryGetComponent(out IDamagable damagable))
-            {
-                isAttacking = true;
-                damagable.TakeDamage(100f,gameObject);
-                state = MonsterState.Idle;
-            }
-            else
-            {
-                isAttacking = true;
+                parent.transform.position = new Vector3(direction.transform.position.x,1,direction.transform.position.z);
+                if (direction.TryGetComponent(out IDamagable damagable))
+                {
+                    damagable.TakeDamage(100f,gameObject);
+                }
+                animator.SetTrigger("toIdle");
+                direction = null;
             }
         }
     }
+    
 
     public override void TakeDamage(float damage,  GameObject attacker)
     {
         hp -= damage;
         if (hp <= 0)
         {
-            state = MonsterState.Die;
+            Die();
         }
     }
 
     public override void Die()
     {
-        agent.isStopped = true;
-        // animator.SetTrigger("toDie");
+        animator.SetTrigger("toDie");
         Subdued();
         StartCoroutine(WaitSpawn(5f));
     }
@@ -160,12 +128,9 @@ public class MonsterTest : MonsterRoom
             count += 1;
         }
 
-        if (jailBreak)
+        if (jailBreak && test)
         {
-            if (isStart)
-            {
-                count += 1;
-            }
+            Move();
         }
     }
     /// <summary>
@@ -180,8 +145,9 @@ public class MonsterTest : MonsterRoom
 
         if (jailBreak)
         {
-            isStart = true;
+            StartCoroutine(WaitLook());
         }
+        
     }
     /// <summary>
     /// 통찰 작업
@@ -248,26 +214,23 @@ public class MonsterTest : MonsterRoom
     /// </summary>
     public override void JailBreak()
     {
-        state = MonsterState.Move;
-        agent.isStopped = false;
         count = 0;
+        test = false;
         jailBreak = true;
         // GetComponent<MeshRenderer>().enabled = false;
         masterRoom.doorAnimator.SetTrigger("DoorToggle");
         GameManager.Instance.JailBreak(this);
+        StartCoroutine(WaitAttack());
     }
     public override void Respawn()
     {
-        isStart = false;
         jailBreak = false;
         direction = null;
-        isAttacking = false;
         Image.sprite = images[3];
         masterRoom.InitializeRoom();
-        transform.position = startPosition;
-        transform.eulerAngles = startRotation;
+        parent.transform.position = startPosition;
+        parent.transform.eulerAngles = startRotation;
         hp = maxHp;
-        agent.speed = moveSpeed;
         animator.SetTrigger("toIdle");
     }
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Item
+  - Die
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - UI
   - Room
   - Human
-  - 
+  - Enemy
   - 
   - 
   - 

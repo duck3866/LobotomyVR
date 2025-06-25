@@ -107,6 +107,22 @@ public class GameManager : MonoBehaviour
             jailBreak = false;
         }
     }
+
+    public void MonsterEnter(GameObject monster)
+    {
+        foreach (var human in humanObjects)
+        {
+            human.GetComponent<Human>().FindMonster(monster);
+        }
+    }
+    public void MonsterDie(GameObject monster)
+    {
+        foreach (var human in humanObjects)
+        {
+            human.GetComponent<Human>().ResetTarget(monster);
+        }
+    }
+
     /// <summary>
     /// 에너지를 전부 충족하여 게임이 클리어 될때 호출하는 함수
     /// </summary>
