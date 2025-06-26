@@ -30,7 +30,15 @@ public class MonsterTest2 : MonsterRoom
     }
     public virtual void Update()
     {
-
+        if (Input.GetMouseButtonDown(0))
+        {
+            JailBreak();
+        }
+        
+        if (Input.GetMouseButtonDown(1))
+        {
+            TakeDamage(100, gameObject);
+        }
         if (jailBreak)
         {
             // Debug.Log("jailBreak");

@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class Bird : MonsterRoom
 {
-     public float chaseDistance;
+    public float chaseDistance;
     public float attackDistance;
     public float attackDelay;
     private float nowAttackDelay;
@@ -17,41 +17,58 @@ public class Bird : MonsterRoom
     private NavMeshAgent agent;
     private Animator animator;
     private bool isHit = false;
-    public GameObject parent;
+    public GameObject attackEffect;
+
+    [SerializeField] private float waitTime;
+    private float currentWaitTime = 0;
+    private bool goToHome = false;
+
     public override void Start()
     {
-        startPosition = parent.transform.position;
-        startRotation =  parent.transform.eulerAngles;
+        startPosition = transform.position;
+        startRotation = transform.eulerAngles;
         agent = GetComponent<NavMeshAgent>();
-        animator  = GetComponentInChildren<Animator>();
+        animator = GetComponentInChildren<Animator>();
         agent.speed = moveSpeed;
         hp = maxHp;
     }
+
     public virtual void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (goToHome)
         {
-            JailBreak();
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            TakeDamage(100,gameObject);
-        }
-        if (jailBreak)
-        {
-            // Debug.Log("jailBreak");
-            switch (state)
+            if (Vector3.Distance(transform.position, startPosition) < 1f)
             {
-                case MonsterState.Move:
-                    Move();
-                    break;
-                case MonsterState.Attack:
-                    Attack();
-                    break;
-                case MonsterState.Die:
-                    Die();
-                    break;
+                Die();
+                goToHome = false;
+            }
+        }
+        else
+        {
+            if (jailBreak)
+            {
+                if (currentWaitTime <= waitTime)
+                {
+                    currentWaitTime += Time.deltaTime;
+                }
+                else
+                {
+                    goToHome = true;
+                    GoToHome();
+                }
+
+                switch (state)
+                {
+                    case MonsterState.Move:
+                        Move();
+                        break;
+                    case MonsterState.Attack:
+                        Attack();
+                        break;
+                    case MonsterState.Die:
+                        Die();
+                        break;
+                }
             }
         }
     }
@@ -71,7 +88,8 @@ public class Bird : MonsterRoom
                     distance = Vector3.Distance(transform.position, findPlayer.transform.position);
                 }
             }
-            Debug.Log("끄아아아악"+target);
+
+            Debug.Log("끄아아아악" + target);
             if (target != null)
             {
                 direction = target;
@@ -80,15 +98,27 @@ public class Bird : MonsterRoom
         }
         else
         {
-            if (Vector3.Distance(transform.position,direction.transform.position) > attackDistance)
+            if (Vector3.Distance(transform.position, direction.transform.position) > attackDistance)
             {
-                agent.SetDestination(direction.transform.position);   
+                agent.SetDestination(direction.transform.position);
             }
             else
             {
                 state = MonsterState.Attack;
             }
         }
+    }
+
+    private void GoToHome()
+    {
+        agent.SetDestination(startPosition);
+    }
+
+    private IEnumerator WaitAttack()
+    {
+        attackEffect.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        attackEffect.SetActive(false);
     }
 
     public override void Attack()
@@ -98,28 +128,31 @@ public class Bird : MonsterRoom
             state = MonsterState.Move;
             return;
         }
-        if (Vector3.Distance(transform.position,direction.transform.position) <= attackDistance)
+
+        if (Vector3.Distance(transform.position, direction.transform.position) <= attackDistance)
         {
             if (nowAttackDelay >= attackDelay)
             {
                 if (isHit)
                 {
-                    animator.SetTrigger("toSpeicalAttack");
-                    direction.GetComponent<IDamagable>().TakeDamage(attackPower * 500f,this.gameObject);
+                    animator.SetTrigger("toSpecialAttack");
+                    StartCoroutine(WaitAttack());
+                    direction.GetComponent<IDamagable>().TakeDamage(attackPower * 500f, this.gameObject);
                     nowAttackDelay = 0;
                     isHit = false;
+                    return;
                 }
                 else
                 {
                     animator.SetTrigger("toAttack");
-                    direction.GetComponent<IDamagable>().TakeDamage(attackPower,this.gameObject);
+                    direction.GetComponent<IDamagable>().TakeDamage(attackPower, this.gameObject);
                     nowAttackDelay = 0;
                 }
             }
             else
             {
                 nowAttackDelay += Time.deltaTime;
-            }   
+            }
         }
         else
         {
@@ -129,7 +162,7 @@ public class Bird : MonsterRoom
         }
     }
 
-    public override void TakeDamage(float damage,  GameObject attacker)
+    public override void TakeDamage(float damage, GameObject attacker)
     {
         direction = attacker;
         isHit = true;
@@ -145,6 +178,7 @@ public class Bird : MonsterRoom
         Debug.Log("Test!!!!!!!!!!!!!!!!!!!!!!!!");
         direction = null;
     }
+
     public override void Die()
     {
         agent.isStopped = true;
@@ -152,14 +186,15 @@ public class Bird : MonsterRoom
         Subdued();
         StartCoroutine(WaitSpawn(5f));
     }
-    
+
     /// <summary>
     /// 플레이어가 들어왔을때
     /// </summary>
     public override void PlayerInRoom()
     {
         isInRoom = true;
-    }        
+    }
+
     /// <summary>
     /// 통찰 작업
     /// </summary>
@@ -176,6 +211,7 @@ public class Bird : MonsterRoom
             Result(WorkResult.Bad);
         }
     }
+
     /// <summary>
     /// 콜라이더 범위 트리거 본능/공격 할때 호출됨
     /// </summary>
@@ -195,6 +231,7 @@ public class Bird : MonsterRoom
             }
         }
     }
+
     /// <summary>
     /// 결과 전달 함수
     /// </summary>
@@ -202,7 +239,7 @@ public class Bird : MonsterRoom
     public override void Result(WorkResult result)
     {
         if (masterRoom.isClear) return;
-        
+
         masterRoom.Clear();
         if (result == WorkResult.Good)
         {
@@ -221,11 +258,14 @@ public class Bird : MonsterRoom
             JailBreak();
         }
     }
+
     /// <summary>
     /// 탈옥 함수
     /// </summary>
     public override void JailBreak()
     {
+        currentWaitTime = 0;
+        goToHome = false;
         isHit = false;
         jailBreak = true;
         state = MonsterState.Move;
@@ -233,15 +273,18 @@ public class Bird : MonsterRoom
         GameManager.Instance.JailBreak(this);
         agent.isStopped = false;
     }
+
     public override void Respawn()
     {
+        currentWaitTime = 0;
+        goToHome = false;
         isHit = false;
         jailBreak = false;
         direction = null;
         Image.sprite = images[3];
         masterRoom.InitializeRoom();
-        parent.transform.position = startPosition;
-        parent.transform.eulerAngles = startRotation;
+        transform.position = startPosition;
+        transform.eulerAngles = startRotation;
         hp = maxHp;
         agent.speed = moveSpeed;
         animator.SetTrigger("toIdle");

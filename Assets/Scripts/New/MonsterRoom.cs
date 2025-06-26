@@ -19,8 +19,8 @@ public class MonsterRoom : MonoBehaviour, IDamagable
 
     [SerializeField] protected int valueTest; // 통찰 작업 결과 대조 값
     
-    public Vector3 startPosition; // 시작 위치
-    public Vector3 startRotation; // 시작 위치
+    protected Vector3 startPosition; // 시작 위치
+    protected Vector3 startRotation; // 시작 위치
     public enum WorkResult // 작업 결과 이넘
     {
         Good,
