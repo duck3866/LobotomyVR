@@ -160,7 +160,6 @@ OnBecameInvisible 함수를 공부하여 작동 원리를 알게 되었고 문�
 ## 참고 자료
 
 - Notion: https://buly.kr/2JoQDvx  
-- 참고 영상: https://buly.kr/DEZA0Ok  
 - 시연 영상: https://youtu.be/bwljYmrT55c  
 - 발표 PPT: https://docs.google.com/presentation/d/14YBPuVuJRxeenk4AJxNM3Sm3Myu6Pri0/edit?usp=sharing&ouid=117444794919235435064&rtpof=true&sd=true
 
