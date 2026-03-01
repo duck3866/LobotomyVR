@@ -1,7 +1,10 @@
+
+### 본 프로젝트는 Project Moon의 세계관을 2차 창작한 작품으로
+
+### 모든 저작권은 원 게임사 Project Moon과 각 음악을 제작한 스튜디오에 있음을 분명히 알립니다.
 # LobotomyVR
-
 ![Image](https://github.com/user-attachments/assets/3da88597-eba7-4638-9dcc-ee01b1dad83a)
-
+## 환상체를 관리하고 생존하세요!
 ## 프로젝트 소개
 
 **LobotomyVR**는 인기 인디 게임 *Lobotomy Corporation*을  
