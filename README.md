@@ -186,6 +186,20 @@ VR 환경으로 재해석한 **팬 게임**입니다.
 ---
 
 ## 라이선스 (License)
+본 프로젝트는 단순 학습의 비상업적 용도로 제작되었습니다.
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.  
-자세한 내용은 `LICENSE` 파일을 참고하세요.
+본 프로젝트는 **MIT 라이선스** 하에 배포됩니다.  
+본 프로젝트는 **Meta XR SDK**를 사용하여 Meta Quest 플랫폼용 VR 기능을 구현하였습니다.
+
+### UnityStore
+| 에셋명 | 링크 | 종류 |
+|----|----|----|
+| Demon Horror Creature with Weapon | [링크](https://assetstore.unity.com/packages/3d/characters/creatures/demon-horror-creature-with-weapon-247792?srsltid=AfmBOooxTgWiW5ClXBN_2qajVM6gHuyVCCZUT7Olb2zS37rfY9RntJOp) | FBX  |
+| Low Poly Factory Machine Pack Demo | [링크](https://assetstore.unity.com/packages/3d/props/industrial/low-poly-factory-machine-pack-demo-272637?srsltid=AfmBOoq4cslMd8PS2hPlDJ4pMwgq0pLC2oLr0ONjJ5tBwXW4PVb2hVus) | 배경 FBX |
+| Mimic prototype | [링크](https://assetstore.unity.com/packages/3d/characters/creatures/mimic-prototype-245997) | 기능 에셋 |
+| War FX | [링크](https://assetstore.unity.com/packages/vfx/particles/war-fx-5669) | FX |
+
+### Sketchfab 에셋
+| 모델명 | 링크 | 종류 | 
+|----|----|----|  
+| Lobotomy Corporation: Containment Box | [링크](Lobotomy Corporation: Containment Box) | FBX |
