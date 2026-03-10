@@ -201,4 +201,4 @@ VR 환경으로 재해석한 **팬 게임**입니다.
 ### Sketchfab 에셋
 | 모델명 | 링크 | 종류 | 
 |----|----|----|  
-| Lobotomy Corporation: Containment Box | [링크](Lobotomy Corporation: Containment Box) | FBX |
+| Lobotomy Corporation: Containment Box | [링크](https://sketchfab.com/3d-models/lobotomy-corporation-containment-box-a07776cc94c84022b2563d126ad2d183) | FBX |
